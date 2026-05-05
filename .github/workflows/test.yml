@@ -1,0 +1,107 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - elixir: '1.13.4'
+            otp: '24.3.4.6'
+            os: ubuntu-22.04
+          - elixir: '1.13.4'
+            otp: '24.3.4.6'
+            os: windows-2022
+          - elixir: '1.19.5'
+            otp: '28.1'
+            os: ubuntu-22.04
+          - elixir: '1.19.5'
+            otp: '28.1'
+            os: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Erlang & Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - name: Restore deps cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: mix-${{ runner.os }}-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('mix.exs', 'mix.lock') }}
+          restore-keys: |
+            mix-${{ runner.os }}-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
+
+      - name: Restore PLT cache
+        uses: actions/cache@v4
+        with:
+          path: priv/plts
+          key: plt-${{ runner.os }}-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('mix.exs', 'mix.lock') }}
+          restore-keys: |
+            plt-${{ runner.os }}-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile (warnings as errors)
+        run: mix compile --warnings-as-errors
+
+      - name: Check formatting
+        run: mix format --check-formatted
+
+      - name: Credo
+        run: mix credo --strict
+
+      - name: Dialyzer
+        run: mix dialyzer
+
+      - name: Run tests
+        run: mix test
+
+      - name: Build release
+        run: mix release --overwrite
+
+      - name: Smoke test release (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          _build/dev/rel/intellij_elixir/bin/intellij_elixir daemon
+          for i in $(seq 1 20); do
+            pid=$(_build/dev/rel/intellij_elixir/bin/intellij_elixir pid 2>/dev/null) && break
+            sleep 0.5
+          done
+          if [ -z "$pid" ]; then echo "Quoter failed to start"; exit 1; fi
+          result=$(_build/dev/rel/intellij_elixir/bin/intellij_elixir rpc 'GenServer.call(IntellijElixir.Quoter, "1 + 2")')
+          _build/dev/rel/intellij_elixir/bin/intellij_elixir stop
+          echo "Quoter returned: $result"
+          echo "$result" | grep -q "{:ok"
+
+      - name: Smoke test release (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Start-Process -NoNewWindow -FilePath "_build/dev/rel/intellij_elixir/bin/intellij_elixir.bat" -ArgumentList "start"
+          $ready = $false
+          for ($i = 0; $i -lt 20; $i++) {
+            $pid = & _build/dev/rel/intellij_elixir/bin/intellij_elixir.bat pid 2>$null
+            if ($LASTEXITCODE -eq 0 -and $pid) { $ready = $true; break }
+            Start-Sleep -Milliseconds 500
+          }
+          if (-not $ready) { Write-Error "Quoter failed to start"; exit 1 }
+          $result = & _build/dev/rel/intellij_elixir/bin/intellij_elixir.bat rpc "GenServer.call(IntellijElixir.Quoter, ""1 + 2"")"
+          & _build/dev/rel/intellij_elixir/bin/intellij_elixir.bat stop
+          Write-Host "Quoter returned: $result"
+          if ($result -notmatch "\{:ok") { exit 1 }

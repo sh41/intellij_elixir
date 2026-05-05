@@ -6,13 +6,11 @@ defmodule IntellijElixir.Mixfile do
       app: :intellij_elixir,
       deps: deps(),
       description: description(),
+      dialyzer: dialyzer(),
       docs: docs(),
-      elixir: "~> 1.7",
+      elixir: "~> 1.11",
       package: package(),
-      preferred_cli_env: [
-        credo: :test,
-        dialyzer: :test
-      ],
+      releases: releases(),
       version: "2.1.0"
     ]
   end
@@ -21,7 +19,23 @@ defmodule IntellijElixir.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger], mod: {IntellijElixir, []}]
+    [extra_applications: [:logger], mod: {IntellijElixir, []}]
+  end
+
+  defp releases do
+    [
+      intellij_elixir: [
+        include_erts: true,
+        applications: [runtime_tools: :permanent],
+        cookie: "intellij_elixir"
+      ]
+    ]
+  end
+
+  defp dialyzer do
+    [
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -35,10 +49,8 @@ defmodule IntellijElixir.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:credo, "1.0.0", only: :test},
-      {:dialyxir, "~> 0.5", only: :test, runtime: false},
-      {:distillery, "~> 2.0", runtime: false},
-      {:ex_doc, "~> 0.19.0", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 
