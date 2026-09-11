@@ -3,7 +3,8 @@
 # asks the running Quoter to quote "1 + 2" and checks the answer.
 set -euo pipefail
 
-rel=_build/${MIX_ENV:-dev}/rel/intellij_elixir/bin/intellij_elixir
+# prod unless MIX_ENV says otherwise, as intellij-elixir builds it (DEFAULT_MIX_ENV in buildSrc/.../MixEnvironment.kt).
+rel=_build/${MIX_ENV:-prod}/rel/intellij_elixir/bin/intellij_elixir
 if [[ ${OS:-} == Windows_NT ]]; then
   # No run_erl on Windows, so there is no daemon command.
   rel+=.bat
