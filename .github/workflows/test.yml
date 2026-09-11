@@ -72,33 +72,6 @@ jobs:
       - name: Build release
         run: mix release --overwrite
 
-      - name: Smoke test release (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          _build/dev/rel/intellij_elixir/bin/intellij_elixir daemon
-          for i in $(seq 1 20); do
-            quoter_pid=$(_build/dev/rel/intellij_elixir/bin/intellij_elixir pid 2>/dev/null) && break
-            sleep 0.5
-          done
-          if [ -z "$quoter_pid" ]; then echo "Quoter failed to start"; exit 1; fi
-          result=$(_build/dev/rel/intellij_elixir/bin/intellij_elixir rpc 'GenServer.call(IntellijElixir.Quoter, "1 + 2") |> IO.inspect')
-          _build/dev/rel/intellij_elixir/bin/intellij_elixir stop
-          echo "Quoter returned: $result"
-          echo "$result" | grep -q "{:ok"
-
-      - name: Smoke test release (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Start-Process -NoNewWindow -FilePath "_build/dev/rel/intellij_elixir/bin/intellij_elixir.bat" -ArgumentList "start"
-          $ready = $false
-          for ($i = 0; $i -lt 20; $i++) {
-            $quoter_pid = & _build/dev/rel/intellij_elixir/bin/intellij_elixir.bat pid 2>$null
-            if ($LASTEXITCODE -eq 0 -and $quoter_pid) { $ready = $true; break }
-            Start-Sleep -Milliseconds 500
-          }
-          if (-not $ready) { Write-Error "Quoter failed to start"; exit 1 }
-          $result = & _build/dev/rel/intellij_elixir/bin/intellij_elixir.bat rpc "GenServer.call(IntellijElixir.Quoter, ""1 + 2"") |> IO.inspect"
-          & _build/dev/rel/intellij_elixir/bin/intellij_elixir.bat stop
-          Write-Host "Quoter returned: $result"
-          if ($result -notmatch "\{:ok") { exit 1 }
+      - name: Smoke test release
+        shell: bash
+        run: .github/scripts/smoke-test-release.sh
