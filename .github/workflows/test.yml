@@ -16,9 +16,6 @@ jobs:
           - elixir: '1.13.4'
             otp: '24.3.4.6'
             os: ubuntu-22.04
-          - elixir: '1.13.4'
-            otp: '24.3.4.6'
-            os: windows-2022
           - elixir: '1.19.5'
             otp: '28.1'
             os: ubuntu-22.04
