@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # prod unless MIX_ENV says otherwise, as intellij-elixir builds it (DEFAULT_MIX_ENV in buildSrc/.../MixEnvironment.kt).
-rel=_build/${MIX_ENV:-prod}/rel/intellij_elixir/bin/intellij_elixir
+rel=_build/${MIX_ENV:-prod}/rel/quoter/bin/quoter
 if [[ ${OS:-} == Windows_NT ]]; then
   # No run_erl on Windows, so there is no daemon command.
   rel+=.bat

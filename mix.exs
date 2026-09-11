@@ -3,7 +3,7 @@ defmodule IntellijElixir.Mixfile do
 
   def project do
     [
-      app: :intellij_elixir,
+      app: :quoter,
       deps: deps(),
       description: description(),
       dialyzer: dialyzer(),
@@ -24,10 +24,10 @@ defmodule IntellijElixir.Mixfile do
 
   defp releases do
     [
-      intellij_elixir: [
+      quoter: [
         include_erts: true,
         applications: [runtime_tools: :permanent],
-        cookie: "intellij_elixir"
+        cookie: "intellij-elixir-quoter"
       ]
     ]
   end
@@ -82,8 +82,7 @@ defmodule IntellijElixir.Mixfile do
       file: ["lib", "mix.exs" | extras()],
       licenses: ["Apache 2.0"],
       links: %{
-        "Docs" => "https://hexdocs.pm/intellij_elixir",
-        "Github" => "https://github.com/KronicDeth/intellij_elixir"
+        "Github" => "https://github.com/intellij-elixir/intellij-elixir-quoter"
       },
       maintainers: [
         "Luke Imhoff"

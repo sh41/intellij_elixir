@@ -14,7 +14,7 @@ If using JInterface, you'll need to manually construct a `GenServer.call` to `se
 `{ref, {status, quoted}}` that is received:
 
 ```java
-OtpNode otpNode = new OtpNode(shortName + "@127.0.0.1", "intellij_elixir");
+OtpNode otpNode = new OtpNode(shortName + "@127.0.0.1", "intellij-elixir-quoter");
 otpMbox = otpNode.createMbox();
 
 OtpErlangAtom label = new OtpErlangAtom("$gen_call");
