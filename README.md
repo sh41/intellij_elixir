@@ -1,7 +1,7 @@
 IntellijElixir
 ==============
 
-[![Code Climate](https://codeclimate.com/github/KronicDeth/intellij_elixir/badges/gpa.svg)](https://codeclimate.com/github/KronicDeth/intellij_elixir)
+[![Test](https://github.com/intellij-elixir/intellij-elixir-quoter/actions/workflows/test.yml/badge.svg)](https://github.com/intellij-elixir/intellij-elixir-quoter/actions/workflows/test.yml)
 
 Elixir helpers for [intellj-elixir](https://github.com/KronicDeth/intellij-elixir),
 the [Elixir](http://elixir-lang.org) plugin for [JetBrains](https://www.jetbrains.com)
