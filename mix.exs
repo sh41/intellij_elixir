@@ -7,11 +7,10 @@ defmodule IntellijElixir.Mixfile do
       deps: deps(),
       description: description(),
       dialyzer: dialyzer(),
-      docs: docs(),
       elixir: "~> 1.11",
       package: package(),
       releases: releases(),
-      version: "2.1.0"
+      version: "3.0.0"
     ]
   end
 
@@ -60,12 +59,6 @@ defmodule IntellijElixir.Mixfile do
     IntellijElixir allows intellij-elixir to ask Elixir for the native quoted form of code to check that
     intellij-elixir's quoted form matches.
     """
-  end
-
-  defp docs do
-    [
-      extras: extras()
-    ]
   end
 
   defp extras do
