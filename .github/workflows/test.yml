@@ -65,8 +65,10 @@ jobs:
       - name: Check for unused dependencies
         run: mix deps.unlock --check-unused
 
+      # --force here and below: a restored _build is up to date, so without it nothing recompiles and no
+      # warnings are emitted to fail on.
       - name: Compile (warnings as errors)
-        run: mix compile --warnings-as-errors
+        run: mix compile --warnings-as-errors --force
 
       - name: Check formatting
         run: mix format --check-formatted
@@ -127,7 +129,7 @@ jobs:
       - name: Compile tests (warnings as errors)
         env:
           MIX_ENV: test
-        run: mix compile --warnings-as-errors
+        run: mix compile --warnings-as-errors --force
 
       - name: Run tests
         run: mix test
@@ -136,7 +138,7 @@ jobs:
       - name: Compile release (warnings as errors)
         env:
           MIX_ENV: prod
-        run: mix compile --warnings-as-errors
+        run: mix compile --warnings-as-errors --force
 
       - name: Build release
         env:
